@@ -1,5 +1,11 @@
 <resources>
     <string name="app_name">My First Application</string>
     <string name="edit_message">Enter a message</string>
+    <string name="coordinates">Coordinates:</string>
     <string name="button_send">Send</string>
+    <string name="acc_button">Accelerometer</string>
+    <string name="compass_button">Compass</string>
+    <string name="accel_x"></string>
+    <string name="accel_y"></string>
+    <string name="accel_z"></string>
 </resources>
