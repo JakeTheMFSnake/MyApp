@@ -22,7 +22,9 @@ public class CompassActivity extends Activity implements SensorEventListener {
     private Sensor mAccelerometer;
     private Sensor mMagnetometer;
     private float[] mLastAccelerometer = new float[3];
+    private float[] mLastAccelerometerSmooth = new float[3];
     private float[] mLastMagnetometer = new float[3];
+    private float[] mLastMagnetometerSmooth = new float[3];
     private boolean mLastAccelerometerSet = false;
     private boolean mLastMagnetometerSet = false;
     private float[] mR = new float[9];
@@ -35,6 +37,8 @@ public class CompassActivity extends Activity implements SensorEventListener {
     private TextView counterText;
     private boolean step;
     private Vibrator v;
+    float ALPHA = 0.02f;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,13 +76,20 @@ public class CompassActivity extends Activity implements SensorEventListener {
         if (event.sensor == mAccelerometer) {
             System.arraycopy(event.values, 0, mLastAccelerometer, 0, event.values.length);
             mLastAccelerometerSet = true;
+            for(int i =0; i<3;i++){
+                mLastAccelerometerSmooth[i] = smooth(mLastAccelerometer[i],mLastAccelerometerSmooth[i]);
+            }
 
         } else if (event.sensor == mMagnetometer) {
             System.arraycopy(event.values, 0, mLastMagnetometer, 0, event.values.length);
             mLastMagnetometerSet = true;
+            for(int i =0; i<3;i++){
+                mLastMagnetometerSmooth[i] = smooth(mLastMagnetometer[i],mLastMagnetometerSmooth[i]);
+            }
         }
         if (mLastAccelerometerSet && mLastMagnetometerSet) {
-            SensorManager.getRotationMatrix(mR, null, mLastAccelerometer, mLastMagnetometer);
+            //SensorManager.getRotationMatrix(mR, null, mLastAccelerometer, mLastMagnetometer);
+            SensorManager.getRotationMatrix(mR, null, mLastAccelerometerSmooth, mLastMagnetometerSmooth);
             SensorManager.getOrientation(mR, mOrientation);
             float azimuthInRadians = mOrientation[0];
             float azimuthInDegress = (float)(Math.toDegrees(azimuthInRadians)+360)%360;
@@ -142,6 +153,11 @@ public class CompassActivity extends Activity implements SensorEventListener {
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
         // TODO Auto-generated method stub
 
+    }
+
+    private float smooth( float input, float output ) {
+        output = output + ALPHA * (input - output);
+        return output;
     }
 
 }
